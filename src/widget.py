@@ -18,9 +18,7 @@ def mask_card_and_account_info(info: str) -> str:
                 card_number += info[i]
 
         correct_number = card_number[0:7] + card_number[7:14] + card_number[14:19]
-        number_mask = (
-            f"{name_card} {correct_number[:4]} {correct_number[4:6]}** **** {correct_number[12:16]}"
-        )
+        number_mask = f"{name_card} {correct_number[:4]} {correct_number[4:6]}** **** {correct_number[12:16]}"
 
         return number_mask
 
