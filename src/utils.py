@@ -20,7 +20,7 @@ API_KEY = os.getenv("api_key")
 def read_transactions(file_path: Path) -> List[Dict[str, Any]]:
     """Считывает транзакции из JSON-файла."""
     try:
-        with file_path.open(encoding="utf-8") as file:
+        with open(file_path, encoding="utf-8") as file:
             data = json.load(file)
         if isinstance(data, list):
             return data
@@ -49,22 +49,18 @@ def get_transaction_rub(currency: str) -> Any:
         return 1.0
 
 
-def sum_amount(transactions: List[dict]) -> float:
-    """Суммирует суммы всех транзакций"""
-    total_sum = 0.0
-    for transaction in transactions:
-        amount_info = transaction.get("operationAmount", {})
-        currency_code = amount_info.get("currency", {}).get("code")
-        amount_value = float(amount_info.get("amount", 0))
+def sum_amount(transaction: dict) -> None or float:
+    """Сумма транзакции"""
+    amount_info = transaction.get("operationAmount", {})
+    currency_code = amount_info.get("currency", {}).get("code")
+    amount_value = float(amount_info.get("amount", 0))
 
-        if currency_code == "RUB":
-            total_sum += amount_value
+    if currency_code == "RUB":
+        return amount_value
 
-        elif currency_code in ("EUR", "USD"):
-            exchange_rate = get_transaction_rub(currency_code)
-            total_sum += amount_value * exchange_rate
-
-        else:
-            logger.warning("Обнаружена неизвестная валюта: %s", currency_code)
-
-    return total_sum
+    elif currency_code in ("EUR", "USD"):
+        exchange_rate = get_transaction_rub(currency_code)
+        return exchange_rate
+    else:
+        logger.warning("Обнаружена неизвестная валюта: %s", currency_code)
+    return None
