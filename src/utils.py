@@ -4,9 +4,18 @@ from pathlib import Path
 from typing import Any, Dict, List
 import requests
 from dotenv import load_dotenv
+import logging
+
+logger = logging.getLogger("utils")
+logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler("logs/utils.log", encoding="utf-8", mode="w")
+file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s: %(message)s")
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
 
 load_dotenv()
 API_KEY = os.getenv("api_key")
+
 
 def read_transactions(file_path: Path) -> List[Dict[str, Any]]:
     """Считывает транзакции из JSON-файла."""
@@ -16,9 +25,15 @@ def read_transactions(file_path: Path) -> List[Dict[str, Any]]:
         if isinstance(data, list):
             return data
         else:
+            logger.warning("Файл %s содержит неверный формат данных.", file_path)
             return []
-    except (FileNotFoundError, json.JSONDecodeError):
+    except FileNotFoundError:
+        logger.error("Файл %s не найден.", file_path)
         return []
+    except json.JSONDecodeError:
+        logger.error("Ошибка декодирования файла %s.", file_path)
+        return []
+
 
 def get_transaction_rub(currency: str) -> Any:
     """Получает курс валюты от API и возвращает его в виде float"""
@@ -30,8 +45,9 @@ def get_transaction_rub(currency: str) -> Any:
         rate = response_data["rates"]["RUB"]
         return rate
     except requests.exceptions.RequestException as api_error:
-        print(f"Ошибка API: {api_error}")
+        logger.error("Ошибка API при получении курса валюты (%s): %s", currency, api_error)
         return 1.0
+
 
 def sum_amount(transactions: List[dict]) -> float:
     """Суммирует суммы всех транзакций"""
@@ -40,11 +56,15 @@ def sum_amount(transactions: List[dict]) -> float:
         amount_info = transaction.get("operationAmount", {})
         currency_code = amount_info.get("currency", {}).get("code")
         amount_value = float(amount_info.get("amount", 0))
+
         if currency_code == "RUB":
             total_sum += amount_value
+
         elif currency_code in ("EUR", "USD"):
             exchange_rate = get_transaction_rub(currency_code)
             total_sum += amount_value * exchange_rate
+
         else:
-            print(f"Неизвестная валюта: {currency_code}")
+            logger.warning("Обнаружена неизвестная валюта: %s", currency_code)
+
     return total_sum
