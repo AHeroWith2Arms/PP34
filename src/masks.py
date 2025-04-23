@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger("masks")
 logger.setLevel(logging.INFO)
 file_handler = logging.FileHandler(
-    "logs/masks.log", encoding="utf-8", mode="a"
+    "C:/Users/user1/PycharmProjects/PP34/src/logs/masks.log", encoding="utf-8", mode="a"
 )  # режим 'a' означает append (добавление записей)
 file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s: %(message)s")
 file_handler.setFormatter(file_formatter)

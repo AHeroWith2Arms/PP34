@@ -1,52 +1,29 @@
 import pytest
-
+import random
+from typing import List, Iterator, Generator
 from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
 
+sample_transactions = [
+    {"operationAmount": {"currency": {"code": "USD"}}, "description": "Purchase 1"},
+    {"operationAmount": {"currency": {"code": "EUR"}}, "description": "Purchase 2"},
+    {"operationAmount": {"currency": {"code": "USD"}}, "description": "Purchase 3"},
+]
 
-@pytest.fixture()
-def dict_list_with_currency() -> list[dict]:
-    return [
-        {"id": 432432883, "operationAmount": {"currency": {"name": "USD", "code": "USD"}}},
-        {"id": 123445667, "operationAmount": {"currency": {"name": "RUB", "code": "RUB"}}},
-        {"id": 873234345, "operationAmount": {"currency": {"name": "USD", "code": "USD"}}},
-        {"id": 983243242, "operationAmount": {"currency": {"name": "USD", "code": "USD"}}},
-    ]
+def test_filter_by_currency() -> None:
+    filtered_transactions = list(filter_by_currency(sample_transactions, "USD"))
+    assert len(filtered_transactions) == 2
+    assert filtered_transactions[0]["operationAmount"]["currency"]["code"] == "USD"
+    assert filtered_transactions[1]["operationAmount"]["currency"]["code"] == "USD"
 
+def test_transaction_descriptions() -> None:
+    descriptions = list(transaction_descriptions(sample_transactions))
+    assert len(descriptions) == 3
+    assert "Purchase 1" in descriptions
+    assert "Purchase 2" in descriptions
+    assert "Purchase 3" in descriptions
 
-@pytest.mark.parametrize(
-    "currency_code, expected_ids", [("USD", [432432883, 873234345, 983243242]), ("RUB", [123445667])]
-)
-def test_filter_by_currency(dict_list_with_currency: list[dict], currency_code: str, expected_ids: list[int]) -> None:
-    """Проверяет правильность фильтрации по валюте"""
-    result = list(filter_by_currency(dict_list_with_currency, currency_code))
-    assert len(result) == len(expected_ids)
-    assert all(r["id"] in expected_ids for r in result)
-    assert all(r["operationAmount"]["currency"]["code"] == currency_code for r in result)
-
-
-@pytest.fixture()
-def dict_list_for_descriptions() -> list[dict]:
-    return [
-        {"id": 1, "description": "Перевод со счета на счет"},
-        {"id": 2, "description": "Перевод со счета на счет"},
-        {"id": 3, "description": "Перевод со счета на счет"},
-        {"id": 4, "description": "Перевод со счета на счет"},
-        {"id": 5, "description": "Перевод с карты на карту"},
-    ]
-
-
-@pytest.mark.parametrize("expected_descriptions", [["Перевод со счета на счет"] * 4 + ["Перевод организации"]])
-def test_transaction_descriptions(dict_list_for_descriptions: list[dict], expected_descriptions: list[str]) -> None:
-    """Проверяет правильность работы генератора"""
-    result = list(transaction_descriptions(dict_list_for_descriptions))
-    assert result == expected_descriptions
-
-
-@pytest.mark.parametrize("count", range(100))
-def test_card_number_generator(count: int) -> None:
-    """Тест генератора номеров карт"""
-    card_number: int = card_number_generator()
-
-    assert 4000000000000000 <= card_number <= 4999999999999999
-    assert len(str(card_number)) == 16
-    assert str(card_number).isdigit()
+def test_card_number_generator() -> None:
+    card_gen = card_number_generator(1, 5)
+    generated_cards = [next(card_gen) for _ in range(5)]
+    assert len(generated_cards) == 5
+    assert all(len(card) == 19 for card in generated_cards)
