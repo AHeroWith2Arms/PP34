@@ -29,7 +29,3 @@ def format_date(input_date: str) -> str:
     """
     correct_date = f"{input_date[8:10]}.{input_date[5:7]}.{input_date[0:4]}"
     return correct_date
-
-
-user_input = input("Введите информацию о карте или счете: ")
-print(mask_card_and_account_info(user_input))

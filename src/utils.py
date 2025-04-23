@@ -60,7 +60,7 @@ def sum_amount(transaction: dict) -> None or float:
 
     elif currency_code in ("EUR", "USD"):
         exchange_rate = get_transaction_rub(currency_code)
-        return exchange_rate
+        return amount_value * exchange_rate
     else:
         logger.warning("Обнаружена неизвестная валюта: %s", currency_code)
     return None
