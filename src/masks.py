@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger("masks")
 logger.setLevel(logging.INFO)
 file_handler = logging.FileHandler(
-    "C:/Users/user1/PycharmProjects/PP34/src/logs/masks.log", encoding="utf-8", mode="a"
+    "src/logs/masks.log", encoding="utf-8", mode="a"
 )  # режим 'a' означает append (добавление записей)
 file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s: %(message)s")
 file_handler.setFormatter(file_formatter)
@@ -52,7 +52,3 @@ def main() -> None:
             print("Маскированная карта/счёт:", masked_card_or_account)
         else:
             logger.warning("Пользователь ничего не ввёл!")
-
-
-if __name__ == "__main__":
-    main()
