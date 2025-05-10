@@ -10,6 +10,7 @@ def log(file_path: str = None) -> Callable:
     :param file_path: (опционально) Имя файла для записи логов.
                      Если не указано, логи выводятся в консоль.
     """
+
     # Определение функции-декоратора
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
@@ -24,8 +25,7 @@ def log(file_path: str = None) -> Callable:
                 result = None
                 # Форматирование сообщения об ошибке
                 log_msg = (
-                    f"{timestamp} {func.__name__} ошибка: "
-                    f"{type(e).__name__}. Входные данные: {args}, {kwargs}"
+                    f"{timestamp} {func.__name__} ошибка: " f"{type(e).__name__}. Входные данные: {args}, {kwargs}"
                 )
 
             # Запись лога в файл или вывод в консоль
@@ -43,6 +43,7 @@ def log(file_path: str = None) -> Callable:
 
 
 # Примеры использования
+
 
 @log(file_path="mylog.txt")
 def my_function(x: int, y: int) -> int:

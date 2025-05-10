@@ -18,9 +18,7 @@ def mask_card_and_account_info(info: str) -> str:
                 card_number += info[i]
 
         correct_number = card_number[0:7] + card_number[7:14] + card_number[14:19]
-        number_mask = (
-            f"{name_card} {correct_number[:4]} {correct_number[4:6]}** **** {correct_number[12:16]}"
-        )
+        number_mask = f"{name_card} {correct_number[:4]} {correct_number[4:6]}** **** {correct_number[12:16]}"
 
         return number_mask
 
@@ -31,7 +29,3 @@ def format_date(input_date: str) -> str:
     """
     correct_date = f"{input_date[8:10]}.{input_date[5:7]}.{input_date[0:4]}"
     return correct_date
-
-
-user_input = input("Введите информацию о карте или счете: ")
-print(mask_card_and_account_info(user_input))
